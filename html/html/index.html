@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聚宝盆项目 - 100 个小游戏计划</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #1e1b4b 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            margin-bottom: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Search & Filter */
+        .filter-section {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-btn {
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.reset {
+            background: var(--bg-hover);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: var(--primary);
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .project-category {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stat-badge.difficulty-1 { color: var(--success); }
+        .stat-badge.difficulty-2 { color: #84cc16; }
+        .stat-badge.difficulty-3 { color: var(--warning); }
+        .stat-badge.difficulty-4 { color: #f97316; }
+        .stat-badge.difficulty-5 { color: var(--danger); }
+
+        .stat-badge.arpu {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            position: relative;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-hover);
+            border: none;
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .modal-category {
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .modal-body {
+            display: grid;
+            gap: 25px;
+        }
+
+        .modal-section {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .modal-section h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .modal-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .modal-section li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .modal-section li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .modal-stat-item {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .modal-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .modal-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .risk-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .risk-box h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            margin-top: 40px;
+            border: 1px solid var(--border);
+        }
+
+        footer p {
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-bar {
+                gap: 20px;
+            }
+
+            .stat-item {
+                padding: 10px 20px;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .filter-section {
+                padding: 20px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results count */
+        .results-count {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .highlight {
+            background: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 聚宝盆项目</h1>
+            <p>100 个小游戏计划 - 从创意到变现的完整路线图</p>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalProjects">100</div>
+                    <div class="stat-label">项目总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avgDifficulty">2.4/5</div>
+                    <div class="stat-label">平均难度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avgArpu">$0.50/月</div>
+                    <div class="stat-label">平均 ARPU</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCategories">10</div>
+                    <div class="stat-label">项目类别</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="filter-section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索项目名称、介绍或关键词...">
+                <button class="filter-btn" onclick="filterProjects()">搜索</button>
+                <button class="filter-btn reset" onclick="resetFilters()">重置</button>
+            </div>
+            <div class="filter-group">
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">全部类别</option>
+                    <option value="AI 生成类">AI 生成类</option>
+                    <option value="社交攀比类">社交攀比类</option>
+                    <option value="极简解压类">极简解压类</option>
+                    <option value="知识挑战类">知识挑战类</option>
+                    <option value="合成收集类">合成收集类</option>
+                    <option value="反应挑战类">反应挑战类</option>
+                    <option value="策略放置类">策略放置类</option>
+                    <option value="剧情互动类">剧情互动类</option>
+                    <option value="创意工具类">创意工具类</option>
+                    <option value="跨界融合类">跨界融合类</option>
+                </select>
+                <select class="filter-select" id="difficultyFilter">
+                    <option value="">全部难度</option>
+                    <option value="1">★ 简单 (1/5)</option>
+                    <option value="2">★★ 较易 (2/5)</option>
+                    <option value="3">★★★ 中等 (3/5)</option>
+                    <option value="4">★★★★ 较难 (4/5)</option>
+                    <option value="5">★★★★★ 困难 (5/5)</option>
+                </select>
+                <select class="filter-select" id="arpuFilter">
+                    <option value="">全部 ARPU</option>
+                    <option value="low">低 (< $0.3)</option>
+                    <option value="medium">中 ($0.3 - $0.6)</option>
+                    <option value="high">高 (> $0.6)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3>📊 类别分布</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>⭐ 难度分布</h3>
+                <div class="chart-container">
+                    <canvas id="difficultyChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>💰 ARPU 分布</h3>
+                <div class="chart-container">
+                    <canvas id="arpuChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-count" id="resultsCount">显示全部 100 个项目</div>
+
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Projects will be loaded here -->
+        </div>
+
+        <footer>
+            <p>聚宝盆项目计划书 v1.0 | 生成时间：2026-03-03</p>
+            <p>100 个小游戏项目，从创意到变现的完整路线图</p>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <span class="modal-category" id="modalCategory">类别</span>
+                <h2 class="modal-title" id="modalTitle">项目名称</h2>
+                <p id="modalOneLiner" style="color: var(--text-muted); margin-top: 10px;"></p>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Project data
+        const projects = [
+            // Category 1: AI 生成类
+            {id:1,number:"001",category:"AI 生成类",title:"AI 每日故事",oneLiner:"AI 每天生成一个专属互动故事，你的选择改变剧情",difficulty:2,arpu:0.5,devDays:5,apiCost:"$0.01/次",tags:["LLM","互动故事","社交分享"],features:["每天登录获得一个新的 AI 生成故事开头","通过选择对话/行动推动剧情","每个选择导致不同分支，无限可能","可以分享自己的剧情路径给朋友"],risks:["API 成本失控 → 设置调用限制","内容质量不稳定 → 优化 prompt + 人工审核"]},
+            {id:2,number:"002",category:"AI 生成类",title:"AI 画画接龙",oneLiner:"AI 根据你的描述画画，下一个人继续描述，形成接龙",difficulty:3,arpu:1,devDays:7,apiCost:"$0.05/张图",tags:["图像生成","社交互动","接龙"],features:["第 1 人输入一个词/句子","AI 生成对应图片","第 2 人看到图片后输入新的描述","AI 基于新描述生成下一张图","形成有趣的图片接龙链"],risks:["图片生成成本高 → 限制免费次数","不当内容 → 内容审核机制"]},
+            {id:3,number:"003",category:"AI 生成类",title:"AI 猜词大师",oneLiner:"AI 心里想一个词，你通过提问来猜，AI 只能回答是/否",difficulty:2,arpu:0.3,devDays:4,apiCost:"$0.005/次对话",tags:["LLM","猜词","逻辑推理"],features:["AI 随机选择一个词（人物/物品/地点）","玩家通过提问来猜是什么","AI 只能回答\"是\"、\"否\"、\"不相关\"","限制提问次数，看能否猜中"],risks:["AI 回答不一致 → 设置严格规则","作弊（外部搜索）→ 计时限制"]},
+            {id:4,number:"004",category:"AI 生成类",title:"AI 人生重开模拟器",oneLiner:"AI 生成你的人生重开剧本，每次选择都是新人生",difficulty:3,arpu:1,devDays:7,apiCost:"$0.1/局",tags:["LLM","人生模拟","剧情树"],features:["输入基本信息（年龄/职业/地点）","AI 生成人生剧本，每年一个事件","关键节点做选择，影响后续发展","看看你能活到多少岁，成就如何"],risks:["内容敏感性 → 过滤敏感话题","用户沉迷 → 设置每日限制"]},
+            {id:5,number:"005",category:"AI 生成类",title:"AI 对联生成器",oneLiner:"输入上联，AI 对下联，还能评分和解释",difficulty:2,arpu:0.5,devDays:5,apiCost:"$0.01/次",tags:["LLM","传统文化","对联"],features:["用户输入上联（或 AI 生成）","AI 对出下联和横批","AI 解释对联含义和评分","可以挑战好友对对联"],risks:["对联质量 → 优化模型","小众市场 → 加强传播"]},
+            {id:6,number:"006",category:"AI 生成类",title:"AI 梦境解析师",oneLiner:"描述你的梦，AI 解析含义并生成梦境插画",difficulty:3,arpu:1,devDays:7,apiCost:"$0.06/次",tags:["LLM","图像生成","梦境解析"],features:["用户描述昨晚的梦","AI 解析梦境象征意义","AI 生成梦境场景插画","可以分享梦境和解析"],risks:["伪科学争议 → 免责声明","成本较高 → 限制免费次数"]},
+            {id:7,number:"007",category:"AI 生成类",title:"AI 冷笑话工厂",oneLiner:"AI 根据你的关键词生成冷笑话，还能评分",difficulty:2,arpu:0.3,devDays:4,apiCost:"$0.005/次",tags:["LLM","笑话","娱乐"],features:["输入关键词（如\"程序员\"、\"猫\"）","AI 生成相关冷笑话","用户评分好不好笑","可以分享笑话给朋友"],risks:["笑话质量不稳定 → 用户评分筛选","冒犯性内容 → 内容审核"]},
+            {id:8,number:"008",category:"AI 生成类",title:"AI 星座运势",oneLiner:"AI 根据你的星座和生日生成个性化每日运势",difficulty:2,arpu:0.5,devDays:5,apiCost:"$0.01/次",tags:["LLM","星座","运势"],features:["输入星座和生日","AI 生成今日运势（爱情/事业/财运）","AI 给出今日建议","可以查看周运/月运"],risks:["迷信争议 → 娱乐声明","同质化 → 加强个性化"]},
+            {id:9,number:"009",category:"AI 生成类",title:"AI 美食配方师",oneLiner:"输入冰箱里的食材，AI 生成能做的菜和做法",difficulty:2,arpu:1,devDays:5,apiCost:"$0.01/次",tags:["LLM","美食","实用工具"],features:["输入现有食材（如\"鸡蛋、番茄、米饭\"）","AI 推荐能做的菜","AI 生成详细做法步骤","可以收藏和分享菜谱"],risks:["食品安全 → 免责声明","竞争多 → 差异化（AI 个性化）"]},
+            {id:10,number:"010",category:"AI 生成类",title:"AI 歌词创作者",oneLiner:"输入主题和风格，AI 为你创作原创歌词",difficulty:3,arpu:1,devDays:7,apiCost:"$0.02/次",tags:["LLM","音乐","创作"],features:["选择主题（爱情/友情/梦想等）","选择风格（流行/说唱/民谣等）","AI 生成完整歌词（主歌 + 副歌）","可以分享或谱曲演唱"],risks:["版权问题 → 用户协议明确","质量参差 → 多版本选择"]},
+            // Category 2: 社交攀比类
+            {id:11,number:"011",category:"社交攀比类",title:"省份战力排行榜",oneLiner:"类似羊了个羊，按省份排名，为家乡而战",difficulty:3,arpu:0.2,devDays:7,apiCost:"低",tags:["排行榜","地域荣誉","消除"],features:["简单消除/闯关玩法","通关后计入所在省份分数","实时显示各省排名","每日重置，持续竞争"],risks:["服务器压力 → 弹性扩容","地域争议 → 避免敏感话题"]},
+            {id:12,number:"012",category:"社交攀比类",title:"好友默契度测试",oneLiner:"你和好友有多默契？答题测试，生成默契报告",difficulty:2,arpu:0.5,devDays:5,apiCost:"低",tags:["社交","测试","好友互动"],features:["创建默契测试，分享给好友","双方各自答题（关于对方）","AI 计算默契度百分比","生成精美报告可分享"],risks:["隐私问题 → 明确数据使用","作弊 → 答案验证机制"]},
+            {id:13,number:"013",category:"社交攀比类",title:"谁更可能...",oneLiner:"朋友间互评\"谁更可能\"，生成搞笑排行",difficulty:2,arpu:0.3,devDays:4,apiCost:"低",tags:["社交","投票","搞笑"],features:["创建问题（\"谁最可能成为富豪\"）","朋友们投票选择","生成每个人在各个维度的排行","分享搞笑结果"],risks:["冒犯性内容 → 审核机制","群骚扰 → 限制频率"]},
+            {id:14,number:"014",category:"社交攀比类",title:"年度听歌报告 PK",oneLiner:"生成你的听歌人格，和朋友 PK 音乐品味",difficulty:3,arpu:1,devDays:7,apiCost:"中等",tags:["音乐","报告","PK"],features:["连接音乐平台 API（或手动输入）","AI 分析听歌习惯生成报告","和朋友 PK 音乐品味匹配度","分享精美报告"],risks:["API 限制 → 手动输入备选","数据隐私 → 明确说明"]},
+            {id:15,number:"015",category:"社交攀比类",title:"朋友圈人设测试",oneLiner:"分析你的朋友圈，生成你的人设标签",difficulty:3,arpu:0.5,devDays:7,apiCost:"$0.02/次",tags:["社交","AI 分析","人设"],features:["上传朋友圈截图（或手动选择）","AI 分析内容生成人设标签","如\"美食家\"、\"旅行达人\"等","分享人设卡片"],risks:["隐私问题 → 本地处理优先","准确性 → 免责声明"]},
+            {id:16,number:"016",category:"社交攀比类",title:"步数大 PK",oneLiner:"连接微信运动，好友间步数 PK，输的发红包",difficulty:3,arpu:0.1,devDays:7,apiCost:"低",tags:["健康","微信运动","PK"],features:["连接微信运动数据","创建步数 PK 房间","每日/每周结算","输的发红包或做惩罚"],risks:["赌博风险 → 限制金额","作弊（摇步器）→ 检测机制"]},
+            {id:17,number:"017",category:"社交攀比类",title:"早起打卡挑战",oneLiner:"和朋友约好早起，没起的发红包，坚持的分奖金",difficulty:4,arpu:0.05,devDays:10,apiCost:"支付对接",tags:["习惯养成","打卡","奖金"],features:["创建早起挑战（如 6 点起床）","缴纳押金（如 10 元）","每天规定时间打卡","没起的扣钱，坚持的分奖金"],risks:["赌博风险 → 谨慎设计","资质问题 → 需要牌照"]},
+            {id:18,number:"018",category:"社交攀比类",title:"喝水提醒 PK",oneLiner:"和朋友互相提醒喝水，看谁喝得更多",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["健康","提醒","社交监督"],features:["设置每日喝水目标","每次喝水打卡记录","好友间互相提醒","每周排行，最少的请奶茶"],risks:["用户流失 → 加强社交属性","同质化 → 差异化功能"]},
+            {id:19,number:"019",category:"社交攀比类",title:"睡眠时长比拼",oneLiner:"比拼谁睡得好，睡眠时长和质量排行",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["健康","睡眠","排行"],features:["连接手机健康数据或手动记录","记录每日睡眠时长","好友间排行比拼","生成睡眠质量报告"],risks:["数据准确性 → 免责声明","隐私问题 → 数据保护"]},
+            {id:20,number:"020",category:"社交攀比类",title:"消费习惯大揭秘",oneLiner:"匿名分享消费习惯，猜猜谁花钱最多",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["匿名","消费","猜谜"],features:["匿名输入某类消费金额","朋友们猜谁花的最多","公布答案，最接近的赢","可以分享消费观"],risks:["隐私泄露 → 严格匿名","攀比心理 → 引导健康消费观"]},
+            // Category 3: 极简解压类
+            {id:21,number:"021",category:"极简解压类",title:"泡泡纸模拟器",oneLiner:"无限泡泡纸，捏爆它，解压神器",difficulty:1,arpu:0.5,devDays:2,apiCost:"无",tags:["解压","ASMR","模拟"],features:["屏幕上布满泡泡","点击捏爆，有声音和震动反馈","捏爆一定数量解锁新皮肤","无目标，纯解压"],risks:["过于简单 → 加强收集元素","用户流失 → 每日挑战"]},
+            {id:22,number:"022",category:"极简解压类",title:"切肥皂 2.0",oneLiner:"切割各种物体，超真实物理反馈",difficulty:3,arpu:0.5,devDays:7,apiCost:"低",tags:["解压","物理","切割"],features:["选择要切的物体（肥皂、水果、沙子等）","滑动手指切割","真实的物理反馈和音效","收集切割后的形状"],risks:["同质化 → 创新物体","性能要求 → 优化渲染"]},
+            {id:23,number:"023",category:"极简解压类",title:"史莱姆模拟器",oneLiner:"虚拟史莱姆，随意揉捏拉伸，解压神器",difficulty:4,arpu:1,devDays:10,apiCost:"无",tags:["解压","史莱姆","物理引擎"],features:["选择史莱姆类型（透明/珠光/泡沫等）","触摸揉捏、拉伸、按压","真实的粘弹性质感","可以混合颜色"],risks:["技术难度 → 简化版本","性能问题 → 优化算法"]},
+            {id:24,number:"024",category:"极简解压类",title:"桌面整理大师",oneLiner:"把杂乱的物品整理整齐，强迫症福音",difficulty:2,arpu:0.5,devDays:5,apiCost:"低",tags:["解压","整理","强迫症"],features:["给定杂乱的桌面/房间","拖动物品到合适位置","整理完成后评分","追求完美摆放"],risks:["关卡设计 → 多样化场景","重复性 → 随机生成"]},
+            {id:25,number:"025",category:"极简解压类",title:"颜色填充师",oneLiner:"点击填充颜色，看颜色蔓延整个画面",difficulty:2,arpu:0.3,devDays:4,apiCost:"低",tags:["解压","填色","创作"],features:["黑白线稿图","点击区域填充颜色","看颜色蔓延开来","完成一幅彩色画作"],risks:["内容版权 → 原创或授权","同质化 → 特色图稿"]},
+            {id:26,number:"026",category:"极简解压类",title:"沙画艺术家",oneLiner:"手指在沙子上画画，超真实沙粒效果",difficulty:3,arpu:0.5,devDays:7,apiCost:"低",tags:["解压","沙画","创作"],features:["虚拟沙盘","手指滑动形成沙画","可以摇晃重置","保存分享作品"],risks:["性能问题 → 优化粒子数","技术难度 → 简化效果"]},
+            {id:27,number:"027",category:"极简解压类",title:"水波纹模拟器",oneLiner:"点击水面产生涟漪，超真实水波效果",difficulty:4,arpu:0.5,devDays:10,apiCost:"无",tags:["解压","水波","物理模拟"],features:["平静的水面","点击产生水波纹","多点互动产生干涉","可以扔石头、下雨等"],risks:["性能要求高 → 优化算法","过于简单 → 增加互动元素"]},
+            {id:28,number:"028",category:"极简解压类",title:"键盘敲击声",oneLiner:"模拟各种机械键盘声音，打字解压",difficulty:1,arpu:0.3,devDays:2,apiCost:"无",tags:["解压","ASMR","键盘"],features:["虚拟键盘","点击发出机械键盘声","多种轴体可选（青轴/红轴等）","可以打字测试"],risks:["过于简单 → 增加打字游戏","噪音问题 → 音量控制"]},
+            {id:29,number:"029",category:"极简解压类",title:"火焰模拟器",oneLiner:"虚拟打火机，模拟火焰燃烧效果",difficulty:3,arpu:0.5,devDays:7,apiCost:"无",tags:["解压","火焰","模拟"],features:["虚拟打火机","滑动点火","真实的火焰效果","可以点蜡烛、篝火等"],risks:["安全问题 → 明确虚拟","性能问题 → 优化粒子"]},
+            {id:30,number:"030",category:"极简解压类",title:"雨声白噪音",oneLiner:"各种雨声白噪音，帮助放松和睡眠",difficulty:2,arpu:1,devDays:4,apiCost:"低",tags:["解压","白噪音","助眠"],features:["选择雨声类型（小雨/暴雨/雷雨）","混合其他声音（风声/雷声）","定时关闭","背景播放"],risks:["版权 → 原创录音","竞争多 → 差异化"]},
+            // Category 4: 知识挑战类
+            {id:31,number:"031",category:"知识挑战类",title:"每日百科挑战",oneLiner:"每天 10 道百科题，连续答对获奖励",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["知识","答题","每日挑战"],features:["每天 10 道百科题","连续答对获得奖励","排行榜竞争","知识积累"],risks:["题目质量 → 专业审核","用户流失 → 加强奖励"]},
+            {id:32,number:"032",category:"知识挑战类",title:"成语接龙 PK",oneLiner:"和好友成语接龙对战",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["成语","对战","知识"],features:["和好友成语接龙","限时答题","积分排行","成语学习"],risks:["作弊 → 词库验证","同质化 → 创新玩法"]},
+            {id:33,number:"033",category:"知识挑战类",title:"看图猜城市",oneLiner:"根据图片猜城市名",difficulty:2,arpu:0.2,devDays:5,apiCost:"低",tags:["地理","猜谜","图片"],features:["展示城市地标图片","猜城市名称","难度递增","地理知识学习"],risks:["图片版权 → 自有或授权","题目有限 → 持续更新"]},
+            {id:34,number:"034",category:"知识挑战类",title:"电影台词猜猜",oneLiner:"听台词猜电影",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["电影","台词","猜谜"],features:["播放经典电影台词","猜电影名称","分类挑战","电影知识库"],risks:["版权问题 → 合理使用","台词库 → 持续扩充"]},
+            {id:35,number:"035",category:"知识挑战类",title:"歌曲前奏猜名",oneLiner:"听前奏猜歌名",difficulty:3,arpu:0.5,devDays:7,apiCost:"中等",tags:["音乐","猜歌","听力"],features:["播放歌曲前奏","猜歌名和歌手","难度分级","音乐知识"],risks:["音乐版权 → 授权","曲库更新 → 保持新鲜"]},
+            {id:36,number:"036",category:"知识挑战类",title:"历史时间线",oneLiner:"排列历史事件正确顺序",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["历史","排序","知识"],features:["给出历史事件","按时间顺序排列","历史知识学习","难度递增"],risks:["历史准确性 → 专业审核","内容敏感 → 谨慎选题"]},
+            {id:37,number:"037",category:"知识挑战类",title:"化学元素大师",oneLiner:"元素周期表记忆挑战",difficulty:1,arpu:0.2,devDays:4,apiCost:"低",tags:["化学","记忆","教育"],features:["元素周期表挑战","元素属性记忆","趣味学习","进度追踪"],risks:["过于教育化 → 加强游戏性","受众有限 → 推广策略"]},
+            {id:38,number:"038",category:"知识挑战类",title:"地理拼图",oneLiner:"拼出完整世界地图",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["地理","拼图","教育"],features:["世界地图拼图","国家位置学习","难度选择","地理知识"],risks:["边界争议 → 使用标准地图","同质化 → 增加模式"]},
+            {id:39,number:"039",category:"知识挑战类",title:"数学速算王",oneLiner:"限时速算挑战",difficulty:1,arpu:0.2,devDays:4,apiCost:"低",tags:["数学","速算","挑战"],features:["限时数学计算","难度递增","排行榜","计算能力提升"],risks:["过于简单 → 增加题型","枯燥 → 加强趣味性"]},
+            {id:40,number:"040",category:"知识挑战类",title:"诗词填空",oneLiner:"古诗词填空挑战",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["诗词","填空","文化"],features:["古诗词填空","难度分级","诗词学习","文化传承"],risks:["内容准确性 → 专业审核","受众 → 加强推广"]},
+            // Category 5: 合成收集类
+            {id:41,number:"041",category:"合成收集类",title:"合成小动物",oneLiner:"合成解锁新动物，收集图鉴",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["合成","收集","动物"],features:["合成解锁新动物","收集完整图鉴","可爱画风","成就系统"],risks:["同质化 → 创新动物","付费设计 → 平衡性"]},
+            {id:42,number:"042",category:"合成收集类",title:"星球合成",oneLiner:"从小行星合成到超大星球",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["合成","太空","收集"],features:["从小行星开始合成","解锁各种星球","宇宙主题","视觉效果"],risks:["玩法单一 → 增加事件","数值平衡 → 精心设计"]},
+            {id:43,number:"043",category:"合成收集类",title:"美食合成",oneLiner:"合成各种美食，解锁菜谱",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["合成","美食","收集"],features:["合成各种美食","解锁菜谱","美食图鉴","烹饪知识"],risks:["同质化 → 特色菜系","版权 → 原创设计"]},
+            {id:44,number:"044",category:"合成收集类",title:"武器进化",oneLiner:"从石器合成到高科技武器",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["合成","武器","进化"],features:["从石器时代开始","合成到高科技武器","武器图鉴","历史演进"],risks:["暴力内容 → 适度设计","数值 → 平衡性"]},
+            {id:45,number:"045",category:"合成收集类",title:"宠物收集",oneLiner:"收集养成各种宠物",difficulty:3,arpu:1,devDays:10,apiCost:"低",tags:["宠物","收集","养成"],features:["收集各种宠物","宠物养成","互动玩法","社交分享"],risks:["开发成本 → 控制范围","付费点 → 合理设计"]},
+            {id:46,number:"046",category:"合成收集类",title:"卡牌合成",oneLiner:"合成稀有卡牌",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["卡牌","合成","收集"],features:["收集卡牌","合成稀有卡","卡牌对战","策略性"],risks:["平衡性 → 精心设计","付费 → 避免 P2W"]},
+            {id:47,number:"047",category:"合成收集类",title:"宝石矿工",oneLiner:"挖矿合成稀有宝石",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["挖矿","宝石","合成"],features:["挖矿获取宝石","合成稀有宝石","宝石图鉴","收益系统"],risks:["数值设计 → 平衡性","同质化 → 创新玩法"]},
+            {id:48,number:"048",category:"合成收集类",title:"植物进化",oneLiner:"从种子合成到参天大树",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["植物","合成","进化"],features:["从种子开始","合成各种植物","植物图鉴","自然主题"],risks:["玩法单一 → 增加事件","视觉 → 精美设计"]},
+            {id:49,number:"049",category:"合成收集类",title:"汽车工厂",oneLiner:"合成各种汽车",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["汽车","合成","收集"],features:["合成各种汽车","汽车图鉴","改装系统","赛车元素"],risks:["版权 → 原创设计","同质化 → 创新"]},
+            {id:50,number:"050",category:"合成收集类",title:"文明演进",oneLiner:"从原始文明合成到未来文明",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["文明","合成","策略"],features:["从原始文明开始","演进到未来文明","文明图鉴","历史知识"],risks:["复杂度 → 控制范围","历史准确性 → 审核"]},
+            // Category 6: 反应挑战类
+            {id:51,number:"051",category:"反应挑战类",title:"别踩白块儿 2.0",oneLiner:"经典玩法升级，更多模式",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["反应","音乐","经典"],features:["经典玩法复刻","多种游戏模式","音乐节奏","排行榜"],risks:["版权 → 原创设计","同质化 → 创新模式"]},
+            {id:52,number:"052",category:"反应挑战类",title:"节奏大师 Lite",oneLiner:"简化版音游，单指操作",difficulty:3,arpu:0.5,devDays:7,apiCost:"中等",tags:["音乐","节奏","音游"],features:["简化音游玩法","单指操作","热门歌曲","难度分级"],risks:["音乐版权 → 授权","复杂度 → 控制"]},
+            {id:53,number:"053",category:"反应挑战类",title:"反应测试",oneLiner:"测试你的反应速度",difficulty:1,arpu:0.2,devDays:3,apiCost:"低",tags:["反应","测试","挑战"],features:["反应速度测试","多种测试模式","成绩排行","科学分析"],risks:["过于简单 → 增加模式","趣味性 → 加强"]},
+            {id:54,number:"054",category:"反应挑战类",title:"躲避障碍",oneLiner:"控制角色躲避越来越快的障碍",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["反应","躲避","挑战"],features:["控制角色移动","躲避障碍物","速度递增","道具系统"],risks:["同质化 → 创新障碍","难度曲线 → 平衡"]},
+            {id:55,number:"055",category:"反应挑战类",title:"接住掉落物",oneLiner:"移动篮子接住掉落物品",difficulty:1,arpu:0.2,devDays:4,apiCost:"低",tags:["反应","接物","休闲"],features:["移动篮子接物","不同分值物品","速度递增","道具系统"],risks:["过于简单 → 增加模式","视觉 → 精美设计"]},
+            {id:56,number:"056",category:"反应挑战类",title:"精准点击",oneLiner:"在指定区域点击，考验精准度",difficulty:1,arpu:0.2,devDays:4,apiCost:"低",tags:["反应","精准","挑战"],features:["指定区域点击","考验精准度","时间限制","成绩排行"],risks:["过于简单 → 增加难度","趣味性 → 加强"]},
+            {id:57,number:"057",category:"反应挑战类",title:"记忆翻牌",oneLiner:"翻牌记忆配对",difficulty:1,arpu:0.2,devDays:4,apiCost:"低",tags:["记忆","翻牌","挑战"],features:["翻牌配对","记忆挑战","难度分级","时间挑战"],risks:["同质化 → 创新主题","趣味性 → 加强"]},
+            {id:58,number:"058",category:"反应挑战类",title:"颜色切换",oneLiner:"根据颜色快速切换",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["反应","颜色","挑战"],features:["根据颜色切换","快速反应","难度递增","连击系统"],risks:["视觉疲劳 → 优化配色","同质化 → 创新"]},
+            {id:59,number:"059",category:"反应挑战类",title:"平衡大师",oneLiner:"保持物体平衡不掉落",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["平衡","物理","挑战"],features:["保持物体平衡","物理引擎","难度递增","道具系统"],risks:["物理 bug → 优化","难度 → 平衡"]},
+            {id:60,number:"060",category:"反应挑战类",title:"限时拼图",oneLiner:"在规定时间内完成拼图",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["拼图","限时","挑战"],features:["限时完成拼图","多种图案","难度分级","提示系统"],risks:["版权 → 原创图案","难度 → 平衡"]},
+            // Category 7: 策略放置类
+            {id:61,number:"061",category:"策略放置类",title:"Idle Miner",oneLiner:"挖矿放置，离线收益",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","挖矿","Idle"],features:["挖矿获取资源","自动化生产","离线收益","升级系统"],risks:["数值平衡 → 精心设计","付费点 → 合理"]},
+            {id:62,number:"062",category:"策略放置类",title:"餐厅大亨",oneLiner:"经营餐厅，自动赚钱",difficulty:3,arpu:1,devDays:10,apiCost:"低",tags:["放置","经营","餐厅"],features:["经营餐厅","自动化赚钱","升级设施","员工管理"],risks:["复杂度 → 控制范围","数值 → 平衡"]},
+            {id:63,number:"063",category:"策略放置类",title:"农场主",oneLiner:"种植收获，自动化农场",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","农场","经营"],features:["种植作物","自动化收获","扩大农场","销售收益"],risks:["同质化 → 创新作物","数值 → 平衡"]},
+            {id:64,number:"064",category:"策略放置类",title:"工厂流水线",oneLiner:"建立自动化生产线",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["放置","工厂","自动化"],features:["建立生产线","自动化生产","优化流程","扩大规模"],risks:["复杂度 → 简化","视觉 → 清晰"]},
+            {id:65,number:"065",category:"策略放置类",title:"城市建造者",oneLiner:"放置建造城市",difficulty:3,arpu:1,devDays:10,apiCost:"低",tags:["放置","城市","建造"],features:["建造城市","自动收益","城市规划","建筑升级"],risks:["复杂度 → 控制","数值 → 平衡"]},
+            {id:66,number:"066",category:"策略放置类",title:"科技公司",oneLiner:"研发产品，上市赚钱",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","科技","经营"],features:["研发产品","上市销售","公司扩张","技术升级"],risks:["同质化 → 创新","数值 → 平衡"]},
+            {id:67,number:"067",category:"策略放置类",title:"游戏开发者",oneLiner:"模拟开发游戏赚钱",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","游戏","模拟"],features:["开发游戏","发布销售","工作室扩张","技术研发"],risks:["同质化 → 创新","数值 → 平衡"]},
+            {id:68,number:"068",category:"策略放置类",title:"网红养成",oneLiner:"培养网红，接广告",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","网红","养成"],features:["培养网红","内容创作","接广告","粉丝增长"],risks:["内容敏感 → 审核","数值 → 平衡"]},
+            {id:69,number:"069",category:"策略放置类",title:"股票大亨",oneLiner:"模拟炒股，资产增值",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["放置","股票","模拟"],features:["模拟炒股","资产增值","投资策略","市场波动"],risks:["投资风险 → 声明","数值 → 平衡"]},
+            {id:70,number:"070",category:"策略放置类",title:"帝国防御",oneLiner:"放置塔防，自动战斗",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["放置","塔防","策略"],features:["放置防御塔","自动战斗","升级塔防","关卡挑战"],risks:["平衡性 → 设计","同质化 → 创新"]},
+            // Category 8: 剧情互动类
+            {id:71,number:"071",category:"剧情互动类",title:"AI 恋爱模拟器",oneLiner:"和 AI 角色谈恋爱",difficulty:3,arpu:1,devDays:10,apiCost:"$0.05/次",tags:["AI","恋爱","剧情"],features:["和 AI 角色互动","多分支剧情","角色养成","情感体验"],risks:["内容敏感 → 审核","API 成本 → 控制"]},
+            {id:72,number:"072",category:"剧情互动类",title:"侦探推理",oneLiner:"AI 生成案件，你来破案",difficulty:3,arpu:0.5,devDays:10,apiCost:"$0.05/次",tags:["AI","推理","侦探"],features:["AI 生成案件","收集线索","推理破案","多结局"],risks:["逻辑性 → 优化","内容 → 审核"]},
+            {id:73,number:"073",category:"剧情互动类",title:"末日生存",oneLiner:"末日背景，选择求生",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["末日","生存","剧情"],features:["末日背景","生存选择","资源管理","多结局"],risks:["内容敏感 → 适度","复杂度 → 控制"]},
+            {id:74,number:"074",category:"剧情互动类",title:"宫廷斗争",oneLiner:"后宫甄嬛传式剧情",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["宫廷","剧情","选择"],features:["宫廷背景","权谋斗争","角色互动","多结局"],risks:["历史准确性 → 审核","内容 → 适度"]},
+            {id:75,number:"075",category:"剧情互动类",title:"职场模拟器",oneLiner:"职场选择，升职加薪",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["职场","模拟","剧情"],features:["职场背景","工作选择","升职加薪","人际关系"],risks:["内容真实 → 适度","同质化 → 创新"]},
+            {id:76,number:"076",category:"剧情互动类",title:"校园回忆",oneLiner:"重返校园，重新选择",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["校园","青春","剧情"],features:["校园背景","青春故事","重新选择","多结局"],risks:["内容 → 健康向上","同质化 → 创新"]},
+            {id:77,number:"077",category:"剧情互动类",title:"武侠江湖",oneLiner:"武侠世界，闯荡江湖",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["武侠","江湖","剧情"],features:["武侠世界","闯荡江湖","武功修炼","多结局"],risks:["内容 → 适度","复杂度 → 控制"]},
+            {id:78,number:"078",category:"剧情互动类",title:"星际探险",oneLiner:"太空探索，发现新星球",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["太空","探险","剧情"],features:["太空背景","探索星球","资源管理","多结局"],risks:["科学准确性 → 适度","复杂度 → 控制"]},
+            {id:79,number:"079",category:"剧情互动类",title:"魔法学院",oneLiner:"学习魔法，成为法师",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["魔法","学院","剧情"],features:["魔法学院","学习魔法","冒险挑战","多结局"],risks:["设定 → 一致性","复杂度 → 控制"]},
+            {id:80,number:"080",category:"剧情互动类",title:"恐怖密室",oneLiner:"恐怖逃脱，多结局",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["恐怖","逃脱","剧情"],features:["恐怖背景","密室逃脱","解谜元素","多结局"],risks:["恐怖程度 → 适度","内容 → 审核"]},
+            // Category 9: 创意工具类
+            {id:81,number:"081",category:"创意工具类",title:"表情包生成器",oneLiner:"输入文字生成表情包",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["工具","表情包","创意"],features:["输入文字","生成表情包","模板选择","分享下载"],risks:["版权 → 原创模板","内容 → 审核"]},
+            {id:82,number:"082",category:"创意工具类",title:"头像制作器",oneLiner:"AI 生成专属头像",difficulty:3,arpu:0.5,devDays:7,apiCost:"$0.02/次",tags:["AI","头像","工具"],features:["AI 生成头像","风格选择","个性化定制","下载分享"],risks:["API 成本 → 控制","版权 → 明确"]},
+            {id:83,number:"083",category:"创意工具类",title:"壁纸工厂",oneLiner:"生成个性化壁纸",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["工具","壁纸","创意"],features:["生成壁纸","风格选择","分辨率适配","下载分享"],risks:["版权 → 原创","同质化 → 创新"]},
+            {id:84,number:"084",category:"创意工具类",title:"签名设计",oneLiner:"AI 设计艺术签名",difficulty:2,arpu:0.5,devDays:5,apiCost:"低",tags:["AI","签名","工具"],features:["输入姓名","AI 设计签名","风格选择","下载学习"],risks:["准确性 → 优化","付费 → 合理"]},
+            {id:85,number:"085",category:"创意工具类",title:"漫画脸",oneLiner:"照片转漫画风格",difficulty:3,arpu:0.5,devDays:7,apiCost:"$0.02/次",tags:["AI","漫画","工具"],features:["上传照片","转漫画风格","风格选择","下载分享"],risks:["API 成本 → 控制","隐私 → 保护"]},
+            {id:86,number:"086",category:"创意工具类",title:"老照片修复",oneLiner:"AI 修复老照片",difficulty:3,arpu:1,devDays:7,apiCost:"$0.05/次",tags:["AI","修复","工具"],features:["上传老照片","AI 修复","画质提升","下载保存"],risks:["API 成本 → 控制","效果 → 优化"]},
+            {id:87,number:"087",category:"创意工具类",title:"语音变声",oneLiner:"改变声音效果",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["工具","变声","音频"],features:["录制语音","变声处理","效果选择","分享下载"],risks:["滥用 → 防范","版权 → 明确"]},
+            {id:88,number:"088",category:"创意工具类",title:"GIF 制作器",oneLiner:"制作动态 GIF",difficulty:2,arpu:0.3,devDays:5,apiCost:"低",tags:["工具","GIF","视频"],features:["上传视频/图片","制作 GIF","编辑优化","分享下载"],risks:["性能 → 优化","同质化 → 创新"]},
+            {id:89,number:"089",category:"创意工具类",title:"海报设计",oneLiner:"模板化海报制作",difficulty:2,arpu:0.5,devDays:5,apiCost:"低",tags:["工具","海报","设计"],features:["选择模板","编辑内容","导出高清","分享下载"],risks:["版权 → 原创模板","同质化 → 创新"]},
+            {id:90,number:"090",category:"创意工具类",title:"视频剪辑 Lite",oneLiner:"简化版视频剪辑",difficulty:4,arpu:1,devDays:14,apiCost:"低",tags:["工具","视频","剪辑"],features:["视频导入","基础剪辑","特效添加","导出分享"],risks:["复杂度 → 控制","性能 → 优化"]},
+            // Category 10: 跨界融合类
+            {id:91,number:"091",category:"跨界融合类",title:"健身 + 游戏",oneLiner:"运动闯关，消耗卡路里",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["健身","游戏","健康"],features:["运动闯关","卡路里消耗","健康数据","成就系统"],risks:["健康风险 → 声明","数据准确性 → 免责"]},
+            {id:92,number:"092",category:"跨界融合类",title:"学习 + 养成",oneLiner:"背单词养宠物",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["学习","养成","教育"],features:["背单词","宠物养成","学习进度","成就奖励"],risks:["教育性 → 保证","趣味性 → 平衡"]},
+            {id:93,number:"093",category:"跨界融合类",title:"音乐 + 塔防",oneLiner:"根据节奏放置塔防",difficulty:3,arpu:0.5,devDays:10,apiCost:"中等",tags:["音乐","塔防","节奏"],features:["音乐节奏","放置塔防","节奏战斗","歌曲选择"],risks:["音乐版权 → 授权","复杂度 → 控制"]},
+            {id:94,number:"094",category:"跨界融合类",title:"烹饪 + 消除",oneLiner:"消除食材做料理",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["烹饪","消除","休闲"],features:["消除食材","制作料理","菜谱解锁","餐厅经营"],risks:["同质化 → 创新","版权 → 原创"]},
+            {id:95,number:"095",category:"跨界融合类",title:"阅读 + 解谜",oneLiner:"读书过程中解谜",difficulty:3,arpu:0.5,devDays:10,apiCost:"低",tags:["阅读","解谜","教育"],features:["阅读故事","嵌入谜题","解谜推进","知识学习"],risks:["版权 → 原创内容","难度 → 平衡"]},
+            {id:96,number:"096",category:"跨界融合类",title:"社交 + 答题",oneLiner:"多人在线答题 PK",difficulty:3,arpu:0.3,devDays:10,apiCost:"中等",tags:["社交","答题","多人"],features:["多人在线","实时答题","PK 对战","排行榜"],risks:["服务器 → 稳定性","作弊 → 防范"]},
+            {id:97,number:"097",category:"跨界融合类",title:"购物 + 游戏",oneLiner:"购物获得游戏道具",difficulty:3,arpu:0,devDays:10,apiCost:"中等",tags:["购物","游戏","电商"],features:["购物链接","获得道具","游戏加成","电商分成"],risks:["合作 → 商家","合规 → 审核"]},
+            {id:98,number:"098",category:"跨界融合类",title:"旅游 + 收集",oneLiner:"虚拟旅游收集景点",difficulty:2,arpu:0.5,devDays:7,apiCost:"低",tags:["旅游","收集","教育"],features:["虚拟旅游","收集景点","景点知识","成就系统"],risks:["内容准确性 → 审核","同质化 → 创新"]},
+            {id:99,number:"099",category:"跨界融合类",title:"宠物 + AR",oneLiner:"AR 养虚拟宠物",difficulty:4,arpu:1,devDays:14,apiCost:"低",tags:["AR","宠物","养成"],features:["AR 技术","虚拟宠物","互动玩法","社交分享"],risks:["技术难度 → 优化","性能 → 适配"]},
+            {id:100,number:"100",category:"跨界融合类",title:"元宇宙 + 小游戏",oneLiner:"小游戏中获得元宇宙资产",difficulty:4,arpu:1,devDays:14,apiCost:"中等",tags:["元宇宙","游戏","资产"],features:["小游戏","获得资产","元宇宙互通","交易系统"],risks:["技术 → 复杂","合规 → 谨慎"]}
+        ];
+
+        // Initialize
+        let filteredProjects = [...projects];
+
+        // Render projects
+        function renderProjects(projectsToRender) {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = '';
+
+            projectsToRender.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.onclick = () => openModal(project);
+
+                const difficultyStars = '★'.repeat(project.difficulty) + '☆'.repeat(5 - project.difficulty);
+
+                card.innerHTML = `
+                    <div class="project-number">${project.number}</div>
+                    <span class="project-category">${project.category}</span>
+                    <h3 class="project-title">${project.title}</h3>
+                    <p class="project-desc">${project.oneLiner}</p>
+                    <div class="project-stats">
+                        <span class="stat-badge difficulty-${project.difficulty}" title="开发难度">
+                            ⭐ ${difficultyStars}
+                        </span>
+                        <span class="stat-badge arpu" title="预估 ARPU">
+                            💰 $${project.arpu}/月
+                        </span>
+                        <span class="stat-badge" title="预计开发时间">
+                            📅 ${project.devDays}天
+                        </span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            // Update results count
+            const countEl = document.getElementById('resultsCount');
+            if (projectsToRender.length === projects.length) {
+                countEl.textContent = `显示全部 ${projects.length} 个项目`;
+            } else {
+                countEl.textContent = `找到 ${projectsToRender.length} 个项目`;
+            }
+        }
+
+        // Filter projects
+        function filterProjects() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const category = document.getElementById('categoryFilter').value;
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const arpuLevel = document.getElementById('arpuFilter').value;
+
+            filteredProjects = projects.filter(project => {
+                // Search filter
+                const matchSearch = !searchTerm || 
+                    project.title.toLowerCase().includes(searchTerm) ||
+                    project.oneLiner.toLowerCase().includes(searchTerm) ||
+                    project.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+
+                // Category filter
+                const matchCategory = !category || project.category === category;
+
+                // Difficulty filter
+                const matchDifficulty = !difficulty || project.difficulty === parseInt(difficulty);
+
+                // ARPU filter
+                let matchArpu = true;
+                if (arpuLevel === 'low') {
+                    matchArpu = project.arpu < 0.3;
+                } else if (arpuLevel === 'medium') {
+                    matchArpu = project.arpu >= 0.3 && project.arpu <= 0.6;
+                } else if (arpuLevel === 'high') {
+                    matchArpu = project.arpu > 0.6;
+                }
+
+                return matchSearch && matchCategory && matchDifficulty && matchArpu;
+            });
+
+            renderProjects(filteredProjects);
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('difficultyFilter').value = '';
+            document.getElementById('arpuFilter').value = '';
+            filteredProjects = [...projects];
+            renderProjects(filteredProjects);
+        }
+
+        // Search on Enter
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                filterProjects();
+            }
+        });
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', () => {
+            filterProjects();
+        });
+
+        // Filter change
+        document.getElementById('categoryFilter').addEventListener('change', filterProjects);
+        document.getElementById('difficultyFilter').addEventListener('change', filterProjects);
+        document.getElementById('arpuFilter').addEventListener('change', filterProjects);
+
+        // Modal functions
+        function openModal(project) {
+            document.getElementById('modalCategory').textContent = project.category;
+            document.getElementById('modalTitle').textContent = `项目 ${project.number}: ${project.title}`;
+            document.getElementById('modalOneLiner').textContent = project.oneLiner;
+
+            const modalBody = document.getElementById('modalBody');
+            const difficultyStars = '★'.repeat(project.difficulty) + '☆'.repeat(5 - project.difficulty);
+
+            modalBody.innerHTML = `
+                <div class="modal-stats">
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-value" style="color: var(--warning)">${difficultyStars}</div>
+                        <div class="modal-stat-label">开发难度</div>
+                    </div>
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-value" style="color: var(--success)">$${project.arpu}/月</div>
+                        <div class="modal-stat-label">预估 ARPU</div>
+                    </div>
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-value" style="color: var(--primary)">${project.devDays}天</div>
+                        <div class="modal-stat-label">预计工时</div>
+                    </div>
+                    <div class="modal-stat-item">
+                        <div class="modal-stat-value" style="color: var(--secondary)">${project.apiCost}</div>
+                        <div class="modal-stat-label">API 成本</div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4>🎯 核心玩法</h4>
+                    <ul>
+                        ${project.features.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <h4>🏷️ 标签</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        ${project.tags.map(tag => 
+                            `<span style="padding: 5px 12px; background: var(--primary); border-radius: 20px; font-size: 0.85rem;">${tag}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+
+                <div class="risk-box">
+                    <h4>⚠️ 风险评估</h4>
+                    <ul>
+                        ${project.risks.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('projectModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on outside click
+        document.getElementById('projectModal').addEventListener('click', (e) => {
+            if (e.target.id === 'projectModal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Category distribution
+            const categoryCount = {};
+            projects.forEach(p => {
+                categoryCount[p.category] = (categoryCount[p.category] || 0) + 1;
+            });
+
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCount),
+                    datasets: [{
+                        data: Object.values(categoryCount),
+                        backgroundColor: [
+                            '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+                            '#ec4899', '#f43f5e', '#f97316', '#eab308',
+                            '#84cc16', '#10b981'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Difficulty distribution
+            const difficultyCount = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+            projects.forEach(p => {
+                difficultyCount[p.difficulty]++;
+            });
+
+            new Chart(document.getElementById('difficultyChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['★ 简单', '★★ 较易', '★★★ 中等', '★★★★ 较难', '★★★★★ 困难'],
+                    datasets: [{
+                        label: '项目数量',
+                        data: [difficultyCount[1], difficultyCount[2], difficultyCount[3], difficultyCount[4], difficultyCount[5]],
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+
+            // ARPU distribution
+            let arpuLow = 0, arpuMid = 0, arpuHigh = 0;
+            projects.forEach(p => {
+                if (p.arpu < 0.3) arpuLow++;
+                else if (p.arpu <= 0.6) arpuMid++;
+                else arpuHigh++;
+            });
+
+            new Chart(document.getElementById('arpuChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['低 (< $0.3)', '中 ($0.3-0.6)', '高 (> $0.6)'],
+                    datasets: [{
+                        data: [arpuLow, arpuMid, arpuHigh],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        renderProjects(projects);
+        initCharts();
+    </script>
+</body>
+</html>

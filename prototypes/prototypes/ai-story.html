@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 每日故事</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #e8e8e8;
+        }
+        
+        h1 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .story-container {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .story-title {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+            padding-bottom: 15px;
+        }
+        
+        .story-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            min-height: 150px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .choice-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice-btn::before {
+            content: '➤';
+            margin-right: 10px;
+            color: #ffd700;
+        }
+        
+        .choice-btn:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+        
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .ending {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .ending-title {
+            font-size: 2rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        .ending-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+        
+        .restart-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: #ffd700;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.4);
+        }
+        
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-dot.active {
+            background: #ffd700;
+            transform: scale(1.2);
+        }
+        
+        .progress-dot.completed {
+            background: #27ae60;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>📖 AI 每日故事</h1>
+    
+    <div class="story-container">
+        <div class="progress" id="progress"></div>
+        <div class="story-title" id="storyTitle">神秘的森林</div>
+        <div class="story-content fade-in" id="storyContent"></div>
+        <div class="choices" id="choices"></div>
+    </div>
+    
+    <script>
+        // 故事数据 - 预设分支剧情
+        const story = {
+            start: {
+                title: "🌲 神秘的森林",
+                content: "清晨的阳光透过树叶洒在你身上。你站在一片古老森林的入口，传说这片森林里藏着神秘的宝藏。两条小路在你面前延伸：一条通向森林深处，另一条沿着小溪蜿蜒。",
+                choices: [
+                    { text: "走进森林深处的小路", next: "deepForest" },
+                    { text: "沿着小溪前进", next: "stream" }
+                ]
+            },
+            deepForest: {
+                title: "🌑 幽暗的林间",
+                content: "树木越来越茂密，光线逐渐暗淡。突然，你听到前方传来奇怪的声音。走近一看，发现一只受伤的小狐狸被困在猎人的陷阱里。",
+                choices: [
+                    { text: "帮助小狐狸脱困", next: "helpFox" },
+                    { text: "继续前进，不管它", next: "ignoreFox" }
+                ]
+            },
+            stream: {
+                title: "💧 清澈的小溪",
+                content: "溪水潺潺，水质清澈见底。沿着溪流走了不久，你发现了一座古老的小木屋，烟囱里冒着袅袅炊烟。",
+                choices: [
+                    { text: "敲门拜访", next: "cabin" },
+                    { text: "悄悄绕过去", next: "sneak" }
+                ]
+            },
+            helpFox: {
+                title: "🦊 感恩的狐狸",
+                content: "你小心翼翼地解开了陷阱，小狐狸自由了。它没有立即离开，而是用感激的眼神看着你，然后向森林深处跑去，时不时回头看你，似乎在邀请你跟随。",
+                choices: [
+                    { text: "跟随小狐狸", next: "followFox" },
+                    { text: "继续自己的旅程", next: "continueAlone" }
+                ]
+            },
+            ignoreFox: {
+                title: "⚠️ 迷失方向",
+                content: "你继续前进，但森林越来越复杂。不知不觉中，你发现自己迷路了。四周都是相似的树木，找不到来时的路。天色渐暗，你开始感到恐慌...",
+                choices: [
+                    { text: "尝试原路返回", next: "badEnding1" },
+                    { text: "继续向前走寻找出路", next: "badEnding1" }
+                ]
+            },
+            cabin: {
+                title: "👵 神秘的老人",
+                content: "开门的是一位慈祥的老奶奶。她微笑着说：'我知道你在寻找什么。但真正的宝藏不是金银财宝，而是你一路上的经历和选择。'",
+                choices: [
+                    { text: "请教老奶奶", next: "goodEnding" },
+                    { text: "道谢后离开", next: "neutralEnding" }
+                ]
+            },
+            sneak: {
+                title: "🏃 匆忙的逃离",
+                content: "你小心翼翼地绕过木屋，但不小心踩断了树枝。木屋的门突然打开，你吓得赶紧逃跑，在慌乱中掉进了一个坑里...",
+                choices: [
+                    { text: "试图爬出来", next: "badEnding2" }
+                ]
+            },
+            followFox: {
+                title: "✨ 意外的发现",
+                content: "小狐狸带你来到一个隐蔽的山洞，里面闪烁着金色的光芒。原来这就是传说中的宝藏——但不是金银，而是一整洞窟的古老书籍和知识！",
+                choices: [
+                    { text: "带走几本书", next: "goodEnding" },
+                    { text: "原地阅读学习", next: "bestEnding" }
+                ]
+            },
+            continueAlone: {
+                title: "🚶 孤独的旅程",
+                content: "你继续独自前行，最终找到了一个装满金币的箱子。但当你试图带走它时，发现箱子太重了，而且森林的出口还很远...",
+                choices: [
+                    { text: "尽力带走一些金币", next: "neutralEnding" },
+                    { text: "放弃金币，轻装离开", next: "neutralEnding" }
+                ]
+            },
+            bestEnding: {
+                title: "🏆 最佳结局 - 智慧的宝藏",
+                content: "你选择留在山洞中学习。日复一日，你从古老书籍中获得了无价的智慧。最终，你成为了传说中的智者，帮助了无数人。这才是真正的宝藏！\n\n🎉 恭喜你发现了故事的最佳结局！",
+                isEnding: true
+            },
+            goodEnding: {
+                title: "😊 好结局 - 有意义的收获",
+                content: "你带着知识和智慧离开了森林。虽然没有金银财宝，但你明白了一个道理：真正的财富是经历和成长。你的人生因此变得更加丰富。\n\n🎉 恭喜完成故事！",
+                isEnding: true
+            },
+            neutralEnding: {
+                title: "😐 普通结局 - 平淡的回归",
+                content: "你带着一些收获回到了家。生活继续，这段经历成为了你茶余饭后的谈资。虽然不算精彩，但也不算糟糕。\n\n📖 故事结束。",
+                isEnding: true
+            },
+            badEnding1: {
+                title: "😢 坏结局 - 迷失的旅人",
+                content: "你在森林中徘徊了许久，最终精疲力尽。幸运的是，第二天有护林员发现了你并将你带出森林。但你两手空空，只记得这是一次难忘的（恐怖）经历...\n\n⚠️ 故事以意外结束。",
+                isEnding: true
+            },
+            badEnding2: {
+                title: "😅 尴尬结局 - 掉坑的冒险",
+                content: "你在坑底大喊求救。幸运的是，木屋的主人听到了你的呼救声，把你拉了上来。虽然有些尴尬，但你学到了一个教训：有时候直面问题比逃避更好。\n\n😅 故事结束了。",
+                isEnding: true
+            }
+        };
+        
+        let currentScene = 'start';
+        let sceneHistory = [];
+        
+        // 渲染场景
+        function renderScene(sceneId) {
+            const scene = story[sceneId];
+            if (!scene) return;
+            
+            // 更新标题
+            document.getElementById('storyTitle').textContent = scene.title;
+            
+            // 更新内容（带动画）
+            const contentEl = document.getElementById('storyContent');
+            contentEl.classList.remove('fade-in');
+            void contentEl.offsetWidth; // 触发重绘
+            contentEl.textContent = scene.content;
+            contentEl.classList.add('fade-in');
+            
+            // 更新选项
+            const choicesEl = document.getElementById('choices');
+            choicesEl.innerHTML = '';
+            
+            if (scene.isEnding) {
+                // 结局显示
+                const endingDiv = document.createElement('div');
+                endingDiv.className = 'ending';
+                endingDiv.innerHTML = `
+                    <div class="ending-text">${scene.content.replace(/\n/g, '<br>')}</div>
+                    <button class="restart-btn" onclick="restartStory()">🔄 重新开始</button>
+                `;
+                choicesEl.appendChild(endingDiv);
+            } else {
+                // 显示选择按钮
+                scene.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = choice.text;
+                    btn.onclick = () => makeChoice(choice.next);
+                    choicesEl.appendChild(btn);
+                });
+            }
+            
+            // 更新进度
+            updateProgress();
+        }
+        
+        // 做出选择
+        function makeChoice(nextScene) {
+            sceneHistory.push(currentScene);
+            currentScene = nextScene;
+            renderScene(currentScene);
+        }
+        
+        // 更新进度指示器
+        function updateProgress() {
+            const progressEl = document.getElementById('progress');
+            progressEl.innerHTML = '';
+            
+            // 计算路径长度（简化处理）
+            const maxDots = 5;
+            const currentDepth = Math.min(sceneHistory.length + 1, maxDots);
+            
+            for (let i = 0; i < maxDots; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i < currentDepth) {
+                    dot.classList.add('completed');
+                }
+                if (i === currentDepth - 1) {
+                    dot.classList.add('active');
+                }
+                progressEl.appendChild(dot);
+            }
+        }
+        
+        // 重新开始
+        function restartStory() {
+            currentScene = 'start';
+            sceneHistory = [];
+            renderScene('start');
+        }
+        
+        // 初始化
+        renderScene('start');
+    </script>
+</body>
+</html>
