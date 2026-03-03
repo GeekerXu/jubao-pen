@@ -1,0 +1,49 @@
+# 编译输出
+*.log
+*.out
+*.tmp
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.env
+
+# 临时文件
+*.bak
+*.temp
+.cache/
+
+# 敏感信息
+*.pem
+*.key
+secrets.json
+config.local.json
+
+# 大型文件
+*.zip
+*.tar.gz
+*.rar
+
+# 本地测试文件
+test-output/
+coverage/
